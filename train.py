@@ -107,7 +107,7 @@ def train(epoch, model, optimizer, scheduler, ema):
         stft_prior, stft_prior_log = stft(x_prior[:, 0, 1:])
 
         loss_frame_rec = criterion_l2(stft_rec, stft_truth) + criterion_l1(stft_rec_log, stft_truth_log)
-        loss_frame_prior = criterion_l2(stft_prior, stft_truth_log) + criterion_l1(stft_prior_log, stft_truth_log)
+        loss_frame_prior = criterion_l2(stft_prior, stft_truth) + criterion_l1(stft_prior_log, stft_truth_log)
 
         # KL annealing coefficient
         alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 5e+5)))
@@ -159,7 +159,7 @@ def evaluate(model, ema=None):
         stft_prior, stft_prior_log = stft(x_prior[:, 0, 1:])
 
         loss_frame_rec = criterion_l2(stft_rec, stft_truth) + criterion_l1(stft_rec_log, stft_truth_log)
-        loss_frame_prior = criterion_l2(stft_prior, stft_truth_log) + criterion_l1(stft_prior_log, stft_truth_log)
+        loss_frame_prior = criterion_l2(stft_prior, stft_truth) + criterion_l1(stft_prior_log, stft_truth_log)
 
         # KL annealing coefficient
         alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 1e+6)))
