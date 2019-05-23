@@ -2,8 +2,11 @@
 
 work in progress
 
-A Pytorch Implementation of WaveVAE (Mel Spectrogram --> Waveform) 
-"Parallel Neural Text-to-Speech"
+Note that my implementation isn't stable yet. 
+
+A Pytorch Implementation of WaveVAE (Mel Spectrogram --> Waveform)
+
+part of "Parallel Neural Text-to-Speech"
 
 
 # Requirements
