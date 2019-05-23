@@ -21,7 +21,6 @@ parser.add_argument('--log', type=str, default='./log', help='Log folder.')
 parser.add_argument('--model_name', type=str, default='wavevae_01', help='Model Name')
 parser.add_argument('--load_step', type=int, default=0, help='Load Step')
 
-parser.add_argument('--temp', type=float, default=1.0, help='Temperature')
 parser.add_argument('--num_samples', type=int, default=10, help='Number of samples')
 parser.add_argument('--num_workers', type=int, default=1, help='Number of workers')
 
@@ -82,10 +81,9 @@ for i, (x, _, c, _) in enumerate(test_loader):
         x, c = x.to(device), c.to(device)
         print(x.size())
         q_0 = Normal(x.new_zeros(x.size()), x.new_ones(x.size()))
-        z = q_0.sample() * args.temp
+        z = q_0.sample()
 
-        wav_truth_name = '{}/{}/{}/generate_{}_{}_truth.wav'.format(args.sample_path,
-                                                                    args.teacher_name,
+        wav_truth_name = '{}/{}/generate_{}_{}_truth.wav'.format(args.sample_path,
                                                                     args.model_name,
                                                                     args.load_step,
                                                                     i)
@@ -98,12 +96,10 @@ for i, (x, _, c, _) in enumerate(test_loader):
         torch.cuda.synchronize()
         print('{} seconds'.format(time.time() - start_time))
         wav = x_sample.to(torch.device("cpu")).data.numpy()
-        wav_name = '{}/{}/{}/generate_{}_{}_{}.wav'.format(args.sample_path,
-                                                           args.teacher_name,
+        wav_name = '{}/{}/generate_{}_{}.wav'.format(args.sample_path,
                                                            args.model_name,
                                                            args.load_step,
-                                                           i,
-                                                           args.temp)
+                                                           i)
         librosa.output.write_wav(wav_name, wav, sr=22050)
         print('{} Saved!'.format(wav_name))
 
