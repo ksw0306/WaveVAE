@@ -32,10 +32,8 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 if not os.path.isdir(args.sample_path):
     os.makedirs(args.sample_path)
-if not os.path.isdir(os.path.join(args.sample_path, args.teacher_name)):
-    os.makedirs(os.path.join(args.sample_path, args.teacher_name))
-if not os.path.isdir(os.path.join(args.sample_path, args.teacher_name, args.model_name)):
-    os.makedirs(os.path.join(args.sample_path, args.teacher_name, args.model_name))
+if not os.path.isdir(os.path.join(args.sample_path, args.model_name)):
+    os.makedirs(os.path.join(args.sample_path, args.model_name))
 
 # LOAD DATASETS
 test_dataset = LJspeechDataset(args.data_path, False, 0.1)
