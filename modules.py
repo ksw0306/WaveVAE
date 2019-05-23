@@ -96,14 +96,8 @@ class ExponentialMovingAverage(object):
         self.shadow[name] = new_average.clone()
 
 
-def stft(y, scale='linear'):
+def stft(y):
     D = torch.stft(y, n_fft=1024, hop_length=256, win_length=1024, window=torch.hann_window(1024).cuda())
     D = torch.sqrt(D.pow(2).sum(-1) + 1e-10)
-    # D = torch.sqrt(torch.clamp(D.pow(2).sum(-1), min=1e-10))
-    if scale == 'linear':
-        return D
-    elif scale == 'log':
-        S = 2 * torch.log(torch.clamp(D, 1e-10, float("inf")))
-        return S
-    else:
-        pass
+    S = 2 * torch.log(torch.clamp(D, 1e-10, float("inf")))
+    return D, S

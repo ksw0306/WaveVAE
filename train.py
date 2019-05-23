@@ -102,13 +102,12 @@ def train(epoch, model, optimizer, scheduler, ema):
         optimizer.zero_grad()
         x_rec, x_prior, loss_rec, loss_kl = model(x, c)
 
-        stft_rec = stft(x_rec[:, 0, 1:], scale='linear')
-        stft_truth = stft(x[:, 0, 1:], scale='linear')
-        stft_prior = stft(x_prior[:, 0, 1:], scale='log')
-        stft_truth_log = stft(x[:, 0, 1:], scale='log')
+        stft_rec, stft_rec_log = stft(x_rec[:, 0, 1:])
+        stft_truth, stft_truth_log = stft(x[:, 0, 1:])
+        stft_prior, stft_prior_log = stft(x_prior[:, 0, 1:])
 
-        loss_frame_rec = criterion_rec(stft_rec, stft_truth)
-        loss_frame_prior = criterion_prior(stft_prior, stft_truth_log)
+        loss_frame_rec = criterion_l2(stft_rec, stft_truth) + criterion_l1(stft_rec_log, stft_truth_log)
+        loss_frame_prior = criterion_l2(stft_prior, stft_truth_log) + criterion_l1(stft_prior_log, stft_truth_log)
 
         # KL annealing coefficient
         alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 5e+5)))
@@ -155,13 +154,12 @@ def evaluate(model, ema=None):
 
         x_rec, x_prior, loss_rec, loss_kl = model(x, c)
 
-        stft_rec = stft(x_rec[:, 0, 1:], scale='linear')
-        stft_truth = stft(x[:, 0, 1:], scale='linear')
-        stft_prior = stft(x_prior[:, 0, 1:], scale='log')
-        stft_truth_log = stft(x[:, 0, 1:], scale='log')
+        stft_rec, stft_rec_log = stft(x_rec[:, 0, 1:])
+        stft_truth, stft_truth_log = stft(x[:, 0, 1:])
+        stft_prior, stft_prior_log = stft(x_prior[:, 0, 1:])
 
-        loss_frame_rec = criterion_rec(stft_rec, stft_truth)
-        loss_frame_prior = criterion_prior(stft_prior, stft_truth_log)
+        loss_frame_rec = criterion_l2(stft_rec, stft_truth) + criterion_l1(stft_rec_log, stft_truth_log)
+        loss_frame_prior = criterion_l2(stft_prior, stft_truth_log) + criterion_l1(stft_prior_log, stft_truth_log)
 
         # KL annealing coefficient
         alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 1e+6)))
@@ -288,8 +286,8 @@ if args.num_gpu > 1:
 
 optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=200000, gamma=0.5)
-criterion_rec = nn.MSELoss()
-criterion_prior = nn.L1Loss()
+criterion_l2 = nn.MSELoss()
+criterion_l1 = nn.L1Loss()
 
 ema = ExponentialMovingAverage(args.ema_decay)
 for name, param in model.named_parameters():
