@@ -162,7 +162,7 @@ def evaluate(model, ema=None):
         loss_frame_prior = criterion_l2(stft_prior, stft_truth) + criterion_l1(stft_prior_log, stft_truth_log)
 
         # KL annealing coefficient
-        alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 1e+6)))
+        alpha = 1 / (1 + np.exp(-5e-5 * (global_step - 5e+5)))
         loss_rec, loss_kl = loss_rec.mean(), loss_kl.mean()
         loss_tot = loss_rec + loss_kl * alpha + loss_frame_rec + loss_frame_prior
 
