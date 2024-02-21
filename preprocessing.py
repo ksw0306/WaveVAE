@@ -1,11 +1,11 @@
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from functools import partial
 import numpy as np
 import os
 import librosa
 from multiprocessing import cpu_count
 import argparse
-
+from tqdm import tqdm
 
 def build_from_path(in_dir, out_dir, num_workers=1):
     executor = ProcessPoolExecutor(max_workers=num_workers)
@@ -19,7 +19,13 @@ def build_from_path(in_dir, out_dir, num_workers=1):
             futures.append(executor.submit(
                 partial(_process_utterance, out_dir, index, wav_path, text)))
             index += 1
-    return [future.result() for future in futures]
+    
+    results = []
+    # Wrap `tqdm` around `as_completed(futures)` to update the progress bar as tasks are completed
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing"):
+        results.append(future.result())
+
+    return results
 
 
 def _process_utterance(out_dir, index, wav_path, text):
@@ -37,7 +43,7 @@ def _process_utterance(out_dir, index, wav_path, text):
 
     # Compute a mel-scale spectrogram from the trimmed wav:
     # (N, D)
-    mel_spectrogram = librosa.feature.melspectrogram(wav, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=80, fmin=125, fmax=7600, power=1).T
+    mel_spectrogram = librosa.feature.melspectrogram(y=wav, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=80, fmin=125, fmax=7600, power=1).T
 
     # mel_spectrogram = np.round(mel_spectrogram, decimals=2)
     mel_spectrogram = 20 * np.log10(np.maximum(1e-4, mel_spectrogram)) - reference
