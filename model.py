@@ -55,5 +55,9 @@ class WaveVAE(nn.Module):
         c_up = self.encoder.upsample(c)
         x_sample = self.decoder.generate(z, c_up)
         return x_sample
+    
+    def remove_weight_norm(self):
+        self.encoder.remove_weight_norm()
+        self.decoder.remove_weight_norm()
 
 

@@ -11,7 +11,15 @@ part of "Parallel Neural Text-to-Speech"
 
 # Requirements
 
-PyTorch 0.4.1 & python 3.6 & Librosa
+1. **Install Required Packages**
+```bash
+pip install -r requirements.txt
+```
+2. **For Pytorch**
+https://pytorch.org/get-started/locally/
+
+### Note : Tested on Python 3.9.16, Pytorch 2.2.0 (CUDA 11.8) on Win 10
+
 
 # Examples
 
