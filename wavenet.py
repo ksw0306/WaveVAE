@@ -44,7 +44,7 @@ class Wavenet(nn.Module):
         self.upsample_conv = nn.ModuleList()
         for s in upsample_scales:
             convt = nn.ConvTranspose2d(1, 1, (3, 2 * s), padding=(1, s // 2), stride=(1, s))
-            convt = nn.utils.weight_norm(convt)
+            convt = nn.utils.parametrizations.weight_norm(convt)
             nn.init.kaiming_normal_(convt.weight)
             self.upsample_conv.append(convt)
             self.upsample_conv.append(nn.LeakyReLU(0.4))
@@ -77,3 +77,7 @@ class Wavenet(nn.Module):
         num_dir = 1 if self.causal else 2
         dilations = [2 ** (i % self.num_layers) for i in range(self.num_layers * self.num_blocks)]
         return num_dir * (self.kernel_size - 1) * sum(dilations) + self.front_channels
+
+    def remove_weight_norm(self):
+        for res_blks in self.res_blocks:
+            res_blks.remove_weight_norm()

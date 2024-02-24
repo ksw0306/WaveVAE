@@ -1,0 +1,6 @@
+*.pyc
+DATASETS
+log
+*.wav
+*.pth
+*.npy
